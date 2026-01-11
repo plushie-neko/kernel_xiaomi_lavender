@@ -107,7 +107,7 @@ static void blk_rq_timed_out(struct request *req)
 static void blk_rq_check_expired(struct request *rq, unsigned long *next_timeout,
 			  unsigned int *next_set)
 {
-	const unsigned long deadline = blk_rq_deadline(rq);
+	unsigned long deadline = blk_rq_deadline(rq);
 
 	if (time_after_eq(jiffies, deadline)) {
 		list_del_init(&rq->timeout_list);

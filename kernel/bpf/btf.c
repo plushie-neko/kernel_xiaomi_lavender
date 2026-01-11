@@ -2331,15 +2331,22 @@ static int __btf_new_fd(struct btf *btf)
 
 int btf_new_fd(const union bpf_attr *attr)
 {
+	struct bpf_verifier_log log = { 0 };
 	struct btf *btf;
+	u64 btf_ptr, btf_log_buf_ptr;
 	int ret;
 
-	btf = btf_parse(u64_to_user_ptr(attr->btf),
-			attr->btf_size, attr->btf_log_level,
-			u64_to_user_ptr(attr->btf_log_buf),
+	btf_ptr = attr->btf;
+	btf_log_buf_ptr = attr->btf_log_buf;
+	btf = btf_parse(u64_to_user_ptr(btf_ptr),
+			attr->btf_size,
+			attr->btf_log_level,
+			u64_to_user_ptr(btf_log_buf_ptr),
 			attr->btf_log_size);
-	if (IS_ERR(btf))
-		return PTR_ERR(btf);
+	if (IS_ERR(btf)) {
+		ret = PTR_ERR(btf);
+		goto err_out;
+	}
 
 	ret = btf_alloc_id(btf);
 	if (ret) {
@@ -2357,6 +2364,7 @@ int btf_new_fd(const union bpf_attr *attr)
 	if (ret < 0)
 		btf_put(btf);
 
+err_out:
 	return ret;
 }
 
@@ -2391,8 +2399,10 @@ int btf_get_info_by_fd(const struct btf *btf,
 	u32 info_copy, btf_copy;
 	void __user *ubtf;
 	u32 uinfo_len;
+	u64 info_ptr;
 
-	uinfo = u64_to_user_ptr(attr->info.info);
+	info_ptr = attr->info.info;
+	uinfo = u64_to_user_ptr(info_ptr);
 	uinfo_len = attr->info.info_len;
 
 	info_copy = min_t(u32, uinfo_len, sizeof(info));

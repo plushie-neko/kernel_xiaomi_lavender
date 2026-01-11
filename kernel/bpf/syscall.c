@@ -2198,7 +2198,6 @@ static int bpf_btf_get_info_by_fd(struct btf *btf,
 	struct bpf_btf_info __user *uinfo = u64_to_user_ptr(info_ptr);
 	struct bpf_btf_info info;
 	u32 info_len = attr->info.info_len;
-	void __user *ubtf;
 	int err;
 
 	err = bpf_check_uarg_tail_zero(uinfo, sizeof(info), info_len);
@@ -2231,7 +2230,7 @@ static int bpf_obj_get_info_by_fd(const union bpf_attr *attr,
 		err = bpf_map_get_info_by_fd(f.file, f.file->private_data, attr,
 					     uattr);
 	else if (f.file->f_op == &btf_fops)
-		err = bpf_btf_get_info_by_fd(f.file, f.file->private_data, attr, uattr);
+		err = bpf_btf_get_info_by_fd(f.file->private_data, attr, uattr);
 	else
 		err = -EINVAL;
 
