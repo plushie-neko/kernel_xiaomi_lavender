@@ -560,9 +560,10 @@ static int sdcardfs_permission(struct vfsmount *mnt, struct inode *inode, int ma
 {
 	int err;
 	struct inode tmp;
-	struct sdcardfs_inode_data *top = top_data_get(SDCARDFS_I(inode));
+	struct sdcardfs_inode_data *top;
 
 	memset(&tmp, 0, sizeof(tmp));
+	top = top_data_get(SDCARDFS_I(inode));
 
 	if (IS_ERR(mnt))
 		return PTR_ERR(mnt);
@@ -613,10 +614,9 @@ static int sdcardfs_setattr(struct vfsmount *mnt, struct dentry *dentry, struct 
 	struct inode tmp;
 	struct dentry tmp_d;
 	struct sdcardfs_inode_data *top;
+	const struct cred *saved_cred = NULL;
 
 	memset(&tmp, 0, sizeof(tmp));
-
-	const struct cred *saved_cred = NULL;
 
 	inode = d_inode(dentry);
 	top = top_data_get(SDCARDFS_I(inode));
