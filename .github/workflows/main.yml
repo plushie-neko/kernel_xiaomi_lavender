@@ -79,5 +79,5 @@ jobs:
       - name: Upload Kernel-SU
         uses: actions/upload-artifact@v4
         with:
-          name: KSUN-${{ steps.get_time.outputs.TIME }}
+          name: SukiSU-${{ steps.get_time.outputs.TIME }}
           path: "AnyKernel3/*"
