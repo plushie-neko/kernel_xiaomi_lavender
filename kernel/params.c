@@ -348,9 +348,15 @@ int param_set_invbool(const char *val, const struct kernel_param *kp)
 {
 	int ret;
 	bool boolval;
-	struct kernel_param dummy;
+	struct kernel_param dummy = {
+		.name = NULL,
+		.ops = NULL,
+		.perm = 0,
+		.level = 0,
+		.flags = 0,
+		.arg = &boolval
+	};
 
-	dummy.arg = &boolval;
 	ret = param_set_bool(val, &dummy);
 	if (ret == 0)
 		*(bool *)kp->arg = !boolval;
@@ -404,13 +410,17 @@ static int param_array(struct module *mod,
 		       unsigned int *num)
 {
 	int ret;
-	struct kernel_param kp;
+	/* We don't have the full kernel_param struct, so initialize with known values */
+	struct kernel_param kp = {
+		.name = name,
+		.mod = mod,
+		.ops = NULL,  /* Will be determined from the set function indirectly */
+		.perm = 0,   /* Permission will be handled appropriately */
+		.level = level,
+		.flags = 0,
+		.arg = elem
+	};
 	char save;
-
-	/* Get the name right for errors. */
-	kp.name = name;
-	kp.arg = elem;
-	kp.level = level;
 
 	*num = 0;
 	/* We expect a comma-separated list of values. */
@@ -457,7 +467,15 @@ static int param_array_get(char *buffer, const struct kernel_param *kp)
 {
 	int i, off, ret;
 	const struct kparam_array *arr = kp->arr;
-	struct kernel_param p = *kp;
+	struct kernel_param p = {
+		.name = kp->name,
+		.mod = kp->mod,
+		.ops = kp->ops,
+		.perm = kp->perm,
+		.level = kp->level,
+		.flags = kp->flags,
+		.arg = kp->arg
+	};
 
 	for (i = off = 0; i < (arr->num ? *arr->num : arr->max); i++) {
 		/* Replace \n with comma */
