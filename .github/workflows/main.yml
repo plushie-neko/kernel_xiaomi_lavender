@@ -6,7 +6,7 @@ on:
     - cron: "0 0 * * 6"
   push:
     branches:
-      - HEAD
+      - 14-Retro
   pull_request:
     branches:
       - HEAD
