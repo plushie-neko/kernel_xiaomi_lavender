@@ -214,20 +214,26 @@ static int enable_verity(struct file *filp,
 	desc->log_blocksize = ilog2(arg->block_size);
 
 	/* Get the salt if the user provided one */
-	if (arg->salt_size &&
-	    copy_from_user(desc->salt, u64_to_user_ptr(arg->salt_ptr),
-			   arg->salt_size)) {
-		err = -EFAULT;
-		goto out;
+	if (arg->salt_size) {
+		u64 salt_ptr = arg->salt_ptr;
+
+		if (copy_from_user(desc->salt, u64_to_user_ptr(salt_ptr),
+				   arg->salt_size)) {
+			err = -EFAULT;
+			goto out;
+		}
 	}
 	desc->salt_size = arg->salt_size;
 
 	/* Get the signature if the user provided one */
-	if (arg->sig_size &&
-	    copy_from_user(desc->signature, u64_to_user_ptr(arg->sig_ptr),
-			   arg->sig_size)) {
-		err = -EFAULT;
-		goto out;
+	if (arg->sig_size) {
+		u64 sig_ptr = arg->sig_ptr;
+
+		if (copy_from_user(desc->signature, u64_to_user_ptr(sig_ptr),
+				   arg->sig_size)) {
+			err = -EFAULT;
+			goto out;
+		}
 	}
 	desc->sig_size = cpu_to_le32(arg->sig_size);
 
