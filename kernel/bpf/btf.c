@@ -2331,7 +2331,6 @@ static int __btf_new_fd(struct btf *btf)
 
 int btf_new_fd(const union bpf_attr *attr)
 {
-	struct bpf_verifier_log log = { 0 };
 	struct btf *btf;
 	u64 btf_ptr, btf_log_buf_ptr;
 	int ret;
